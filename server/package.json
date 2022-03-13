@@ -1,0 +1,22 @@
+{
+  "name": "nasa-project-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "set PORT=8000 && node src/server.js",
+    "watch": "nodemon src/server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "csv-parse": "^5.0.4",
+    "express": "^4.17.2",
+    "nasa-project": "file:.."
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
