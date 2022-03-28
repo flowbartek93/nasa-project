@@ -1,3 +1,5 @@
+// const launches = require("./launches.mongo");
+
 const launches = new Map();
 
 let latestFlightNumber = 100;
@@ -10,7 +12,7 @@ const launch = {
   destination: "Kiev",
   customer: ["ZTM", "UAF"],
   upcoming: true,
-  success: true,
+  success: true
 };
 
 launches.set(launch.flightNumber, launch);
@@ -27,12 +29,12 @@ function addNewLaunch(launch) {
       success: true,
       upcoming: true,
       customers: ["ztm", "NASA"],
-      flightNumber: latestFlightNumber,
+      flightNumber: latestFlightNumber
     })
   );
 }
 
 module.exports = {
   getAllLaunches,
-  addNewLaunch,
+  addNewLaunch
 };
