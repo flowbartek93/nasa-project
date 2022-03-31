@@ -3,8 +3,6 @@ const planets = require("./planets.mongo");
 
 const DEFAULT_FLIGHT_NUMBER = 100;
 
-const launches = new Map();
-
 const launch = {
   flightNumber: 100,
   mission: "Destory Tank",
@@ -13,7 +11,7 @@ const launch = {
   target: "Kiev",
   customer: ["ZTM", "UAF"],
   upcoming: true,
-  success: true,
+  success: true
 };
 
 // launches.set(launch.flightNumber, launch);
@@ -24,8 +22,10 @@ async function getAllLaunches() {
   return await launchesDb.find({}, { _id: 0, __v: 0 });
 }
 
-function existsLaunchWithId(launchId) {
-  return launches.has(launchId);
+async function existsLaunchWithId(launchId) {
+  return await launchesDb.findOne({
+    flightNumber: launchId
+  });
 }
 
 async function getLatestFlightNumber() {
@@ -38,31 +38,36 @@ async function getLatestFlightNumber() {
   return latestLaunch.flightNumber;
 }
 
-function abortLaunchById(launchId) {
-  const aborted = launches.get(launchId);
+async function abortLaunchById(launchId) {
+  const aborted = await launchesDb.UpdateOne(
+    {
+      flightNumber: launchId
+    },
+    {
+      upcoming: false,
+      success: false
+    }
+  );
 
-  aborted.upcoming = false;
-  aborted.success = false;
-
-  return aborted;
+  return aborted.modifiedCount === 1;
 }
 
 async function saveLaunch(launch) {
   const planet = await planets.find({
-    keplerName: launch.target,
+    keplerName: launch.target
   });
 
   if (!planet) {
     throw new Error("No matching planet was found");
   }
 
-  await launchesDb.updateOne(
+  await launchesDb.findOneAndUpdate(
     {
-      flightNumber: launch.flightNumber,
+      flightNumber: launch.flightNumber
     },
     launch,
     {
-      upsert: true,
+      upsert: true
     }
   );
 }
@@ -74,7 +79,7 @@ async function scheduleNewLaunch(launch) {
     success: true,
     upcoming: true,
     customers: ["Zero to mastery", "NASA"],
-    flightNumber: newFlightNumber,
+    flightNumber: newFlightNumber
   });
 
   await saveLaunch(newLaunch);
@@ -97,4 +102,5 @@ module.exports = {
   getAllLaunches,
   existsLaunchWithId,
   scheduleNewLaunch,
+  abortLaunchById
 };
