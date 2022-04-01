@@ -4,14 +4,14 @@ const planets = require("./planets.mongo");
 const DEFAULT_FLIGHT_NUMBER = 100;
 
 const launch = {
-  flightNumber: 100,
-  mission: "Destory Tank",
-  rocket: "Javelin",
-  launchDate: new Date("December 2, 2049"),
-  target: "Kiev",
-  customer: ["ZTM", "UAF"],
-  upcoming: true,
-  success: true
+  flightNumber: 100, //flight_number
+  mission: "Destory Tank", //name
+  rocket: "Javelin", //rocket.name
+  launchDate: new Date("December 2, 2049"), //date_local
+  target: "Kiev", // not applicable
+  customer: ["ZTM", "UAF"], //payload.cusotmers for each payload
+  upcoming: true, //upcoming
+  success: true, //success
 };
 
 // launches.set(launch.flightNumber, launch);
@@ -24,7 +24,7 @@ async function getAllLaunches() {
 
 async function existsLaunchWithId(launchId) {
   return await launchesDb.findOne({
-    flightNumber: launchId
+    flightNumber: launchId,
   });
 }
 
@@ -41,11 +41,11 @@ async function getLatestFlightNumber() {
 async function abortLaunchById(launchId) {
   const aborted = await launchesDb.UpdateOne(
     {
-      flightNumber: launchId
+      flightNumber: launchId,
     },
     {
       upcoming: false,
-      success: false
+      success: false,
     }
   );
 
@@ -54,7 +54,7 @@ async function abortLaunchById(launchId) {
 
 async function saveLaunch(launch) {
   const planet = await planets.find({
-    keplerName: launch.target
+    keplerName: launch.target,
   });
 
   if (!planet) {
@@ -63,11 +63,11 @@ async function saveLaunch(launch) {
 
   await launchesDb.findOneAndUpdate(
     {
-      flightNumber: launch.flightNumber
+      flightNumber: launch.flightNumber,
     },
     launch,
     {
-      upsert: true
+      upsert: true,
     }
   );
 }
@@ -79,10 +79,37 @@ async function scheduleNewLaunch(launch) {
     success: true,
     upcoming: true,
     customers: ["Zero to mastery", "NASA"],
-    flightNumber: newFlightNumber
+    flightNumber: newFlightNumber,
   });
 
   await saveLaunch(newLaunch);
+}
+
+const SPACEX_API_URL = "https://api.spacexdata.com/v4/launches/query";
+
+async function loadLaunchData() {
+  console.log("downloading data...");
+
+  const response = await axios.post(SPACEX_API_URL, {
+    query: {},
+    options: {
+      populate: [
+        {
+          patch: "rocket",
+          select: {
+            name: 1,
+          },
+        },
+
+        {
+          path: "payloads",
+          select: {
+            customers: 1,
+          },
+        },
+      ],
+    },
+  });
 }
 
 // function addNewLaunch(launch) {
@@ -102,5 +129,6 @@ module.exports = {
   getAllLaunches,
   existsLaunchWithId,
   scheduleNewLaunch,
-  abortLaunchById
+  abortLaunchById,
+  loadLaunchData,
 };

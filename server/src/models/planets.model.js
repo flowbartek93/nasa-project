@@ -13,12 +13,6 @@ function isHabitablePlanet(planet) {
   );
 }
 
-// const promise = new Promise((resolve, reject) => {
-
-// }).then((res) => {
-
-// })
-
 function loadPlanetsData() {
   return new Promise((res, rej) =>
     fs
@@ -26,17 +20,17 @@ function loadPlanetsData() {
       .pipe(
         parse({
           comment: "#",
-          columns: true
+          columns: true,
         })
       )
-      .on("data", async data => {
+      .on("data", async (data) => {
         if (isHabitablePlanet(data)) {
           // habitablePlanets.push(data);
 
           savePlanet(data);
         }
       })
-      .on("error", err => {
+      .on("error", (err) => {
         console.log(err);
         rej(err);
       })
@@ -58,13 +52,13 @@ async function savePlanet(planet) {
   try {
     await planets.updateOne(
       {
-        keplerName: planet.kepler_name
+        keplerName: planet.kepler_name,
       },
       {
-        keplerName: planet.kepler_name
+        keplerName: planet.kepler_name,
       },
       {
-        upsert: true
+        upsert: true,
       }
     );
   } catch (err) {
@@ -74,5 +68,5 @@ async function savePlanet(planet) {
 
 module.exports = {
   loadPlanetsData,
-  getAllPlanets
+  getAllPlanets,
 };
