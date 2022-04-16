@@ -21,8 +21,7 @@ const lanunchesSchema = new mongoose.Schema({
   },
 
   target: {
-    type: String,
-    required: true
+    type: String
   },
 
   upcoming: {
